@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnRemove;
     private EditText edtdescricao;
     private EditText edtprioridade;
-    private ListView list;
+    private ListView listView;
     private ArrayList<Tarefa> tarefas = new ArrayList<>();
     private Adapter adapter;
 
@@ -37,46 +37,73 @@ public class MainActivity extends AppCompatActivity {
         btnRemove = (Button) findViewById(R.id.buttonRemover);
         edtdescricao = (EditText) findViewById(R.id.editDescricao);
         edtprioridade = (EditText) findViewById(R.id.editPrioridade);
-        list = (ListView) findViewById(R.id.listView);
-        list.setAdapter(adapter);
         adapter = new Adapter(this, tarefas);
+        listView = (ListView) findViewById(R.id.listView);
+        listView.setAdapter(adapter);
+        if(tarefas.isEmpty()){
+            btnRemove.setEnabled(false);
+        }
 
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+
+
+    btnAdd.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (tarefas.isEmpty()) {
+                btnRemove.setEnabled(true);
+            }
+
+            String descricao = edtdescricao.getText().toString();
+            int prioridade = Integer.parseInt(edtprioridade.getText().toString());
+
+            if (validarTarefa(descricao, prioridade)) {
+                Tarefa tarefa = new Tarefa(descricao, prioridade);
+                tarefas.add(tarefa);
+                adapter.notifyDataSetChanged();
+            }
+
+            sortArrayList();
+        }
+    });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view,
                                     int i, long l) {
-                Tarefa tarefa = (Tarefa) list.getItemAtPosition(i);
+                Tarefa tarefa = (Tarefa) listView.getItemAtPosition(i);
                 tarefas.remove(tarefa);
                 adapter.notifyDataSetChanged();
             }
         });
 
-    }
-
-    public void addTask(View view)
-    {
-        if(tarefas.isEmpty()){
-            btnRemove.setEnabled(true);
-        }
-
-        String descricao = edtdescricao.getText().toString();
-        int prioridade = Integer.parseInt(edtprioridade.getText().toString());
-
-        if(validarTarefa(descricao, prioridade)) {
-            Tarefa tarefa = new Tarefa(descricao, prioridade);
-            tarefas.add(tarefa);
+    btnRemove.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            tarefas.remove(0);
             adapter.notifyDataSetChanged();
+            if(tarefas.isEmpty()){
+                btnRemove.setEnabled(false);
+            }
         }
+    });
 
-        sortArrayList();
     }
-
-    public void onRemoveClick(View view) {
-        tarefas.remove(0);
-        adapter.notifyDataSetChanged();
-        if(tarefas.isEmpty()){
-            btnRemove.setEnabled(false);
+    public boolean validarTarefa(String descricao, int prioridade) {
+        Boolean aux = false;
+        if (prioridade < 1 || prioridade > 10) {
+            Toast.makeText(this, "A prioridade deve estar entre 1 e 10.", Toast.LENGTH_SHORT).show();
+            return aux;
+        } else {
+            for (Tarefa tarefa : tarefas) {
+                if (descricao.equals(tarefa.getDescricao())) {
+                    Toast.makeText(this, "Tarefa já cadastrada.", Toast.LENGTH_SHORT).show();
+                    return aux;
+                }
+            }
         }
+        aux = true;
+        return aux;
     }
     public void sortArrayList(){
         Collections.sort(tarefas, new Comparator<Tarefa>() {
@@ -98,29 +125,5 @@ public class MainActivity extends AppCompatActivity {
         });
         adapter.notifyDataSetChanged();
     }
-    public boolean validarTarefa(String descricao, int prioridade) {
-        Boolean aux = false;
-        if (prioridade < 1 || prioridade > 10) {
-            Toast.makeText(this, "A prioridade deve estar entre 1 e 10.", Toast.LENGTH_SHORT).show();
-            return aux;
-        } else {
-            for (Tarefa tarefa : tarefas) {
-                if (edtdescricao.equals(tarefa.getDescricao())) {
-                    Toast.makeText(this, "Tarefa já cadastrada.", Toast.LENGTH_SHORT).show();
-                    return aux;
-                }
-            }
-        }
-        aux = true;
-        return aux;
-    }
 
-    protected void onSaveInstanceState(Bundle state)
-    {
-        super.onSaveInstanceState(state);
-    }
-    protected void onRestoreInstanceState(Bundle savedInstanceState)
-    {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
 }

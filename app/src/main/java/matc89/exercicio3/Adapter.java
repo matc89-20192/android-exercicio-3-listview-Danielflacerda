@@ -22,8 +22,7 @@ public class Adapter extends ArrayAdapter<Tarefa> {
         View view = convertView;
         Tarefa tarefa = getItem(position);
         if (tarefa != null) {
-            LayoutInflater inflater = (LayoutInflater) getContext()
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(android.R.layout.simple_list_item_2, null);
             TextView text1 = view.findViewById(android.R.id.text1);
             TextView text2 = view.findViewById(android.R.id.text2);
